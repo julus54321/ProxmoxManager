@@ -99,6 +99,21 @@ def admin_change_password():
     
     return redirect(url_for('admin_users'))
 
+@app.route('/admin/user/<username>', methods=['GET', 'POST'])
+def admin_user(username):
+    if not session.get('is_admin') or not session.get('logged_in'):
+        return redirect('/')
+    
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return render_template('404.html'), 404
+    
+    if request.method == 'POST':
+        db.session.delete(user)
+        db.session.commit()
+        return redirect(url_for('admin_users'))
+    
+    return render_template('admin_user.html', user=user)
 
 @app.errorhandler(404)
 def page_not_found(error):

@@ -12,19 +12,25 @@
         <thead>
             <tr>
                 <th>Username</th>
+                <th>Admin Status</th>
                 <th>Change Password</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for user in users %}
             <tr>
                 <td>{{ user.username }}</td>
+                <td>{{ user.is_admin }}</td>
                 <td>
                     <form class="container" action="/admin/change_password" method="post">
                         <input type="hidden" name="user_id" value="{{ user.id }}">
                         <input type="password" name="new_password" placeholder="New Password" required>
                         <button type="submit">Update</button>
                     </form>
+                </td>
+                <td>
+                    <a href="{{ url_for('admin_users', username=user.username) }}">Manage</a>
                 </td>
             </tr>
             {% endfor %}

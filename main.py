@@ -63,7 +63,7 @@ def login():
     if user and user.check_password(p):
         session['logged_in'] = True
         session['is_admin'] = user.is_admin
-        return redirect(url_for('index'))
+        return redirect('/admin/')
     return render_template('login.html', message="Incorrect Details")
 
 @app.route('/logout', methods=['GET', 'POST'])
@@ -76,6 +76,28 @@ def admin():
     if not session.get('is_admin') or not session.get('logged_in'):
         return redirect('/')
     return render_template('admin.html')
+
+@app.route('/admin/users')
+def admin_users():
+    if not session.get('is_admin') or not session.get('logged_in'):
+        return redirect('/')
+    users = User.query.all()
+    return render_template('admin_users.html', users=users)
+
+@app.route('/admin/change_password', methods=['POST'])
+def admin_change_password():
+    if not session.get('is_admin') or not session.get('logged_in'):
+        return redirect('/')
+    
+    user_id = request.form.get('user_id')
+    new_password = request.form.get('new_password')
+    user = db.session.get(User, user_id)
+    
+    if user:
+        user.set_password(new_password)
+        db.session.commit()
+    
+    return redirect(url_for('admin_users'))
 
 if __name__ == '__main__':
     with app.app_context():

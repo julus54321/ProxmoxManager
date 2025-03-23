@@ -1,7 +1,10 @@
 from flask import Flask, url_for, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__)
+app.secret_key = "PepoleAreNotBlack"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 db = SQLAlchemy(app)
 
@@ -9,11 +12,18 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
+    is_admin = db.Column(db.Boolean, default=False)
 
-    def __init__(self, username, password):
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+        
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
+
+    def __init__(self, username, password, is_admin=False):
         self.username = username
-        self.password = password
-
+        self.set_password(password)
+        self.is_admin = is_admin
 
 @app.route("/", methods=['GET'])
 def index():
@@ -26,35 +36,63 @@ def index():
 def register():
     if request.method == 'POST':
         try:
-            db.session.add(User(username=request.form['username'], password=request.form['password']))
+            new_user = User(
+                username=request.form['username'],
+                password=request.form['password']
+            )
+            db.session.add(new_user)
             db.session.commit()
             return redirect(url_for('login'))
-        except:
-            return render_template('index.html', message="User already exists")
-    else:
-        return render_template('register.html')
+        except IntegrityError:
+            db.session.rollback()
+            return render_template('register.html', message="User already exists")
+        except Exception as e:
+            db.session.rollback()
+            return render_template('register.html', message="Registration failed")
+    return render_template('register.html')
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
         return render_template('login.html')
-    else:
-        u = request.form['username']
-        p = request.form['password']
-        data = User.query.filter_by(username=u, password=p).first()
-        if data is not None:
-            session['logged_in'] = True
-            return redirect(url_for('index'))
-        return render_template('login.html', message="Incorrect Details")
+    
+    u = request.form['username']
+    p = request.form['password']
+    user = User.query.filter_by(username=u).first()
+    
+    if user and user.check_password(p):
+        session['logged_in'] = True
+        session['is_admin'] = user.is_admin
+        return redirect(url_for('index'))
+    return render_template('login.html', message="Incorrect Details")
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    session['logged_in'] = False
+    session.clear()
     return redirect(url_for('index'))
-    
 
-if(__name__ == '__main__'):
+@app.route('/admin/')
+def admin():
+    if not session.get('is_admin') or not session.get('logged_in'):
+        return redirect('/')
+    return render_template('admin.html')
+
+if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.secret_key = "PepoleAreNotBlack"
-    app.run(host='0.0.0.0', port='5000',debug=True)
+        
+
+        ADMIN_USERNAME = "admin"
+        ADMIN_PASSWORD = "wyrewolwerowanyrewolwerowiecwyrewolwerowalwyrewolwerowanegorewolwerowca"
+        
+        if not User.query.filter_by(username=ADMIN_USERNAME).first():
+            admin_user = User(
+                username=ADMIN_USERNAME,
+                password=ADMIN_PASSWORD,
+                is_admin=True
+            )
+            db.session.add(admin_user)
+            db.session.commit()
+            print(f"Admin user '{ADMIN_USERNAME}' created successfully!")
+
+    app.run(host='0.0.0.0', port='5000', debug=True)

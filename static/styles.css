@@ -12,6 +12,9 @@ div {
     align-items: center;
 }
 
+a {
+    font-family: "Winky Sans";
+}
 
 svg {
     margin-left: 3px;

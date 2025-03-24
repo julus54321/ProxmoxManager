@@ -3,9 +3,26 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Sigma</title>
+        <link rel="stylesheet" href="/static/main.css">
+        <script src="/static/js/home.js"></script>
+        <title>Home Page</title>
+
     </head>
     <body>
-        <h1>sigma</h1>
+        <div class="open-btn" onclick="toggleSidebar()">☰</div>
+
+        <div class="sidebar" id="sidebar">
+            <a href="javascript:void(0)" class="close-btn" onclick="toggleSidebar()">&times;</a>
+            <a href="#">Home</a>
+            <a href="#">About</a>
+            <a href="#">Services</a>
+            <a href="#">Contact</a>
+        </div>
+
+        <div class="overlay" onclick="toggleSidebar()"></div>
+
+        <div class="content">
+            <h1>Sigma</h1>
+        </div>
     </body>
 </html>

@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 
+import test
+
 app = Flask(__name__)
 app.secret_key = "PepoleAreNotBlack"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -98,6 +100,21 @@ def admin_change_password():
         db.session.commit()
     
     return redirect(url_for('admin_users'))
+
+@app.route('/admin/vms/')
+def vms():
+    if not session.get('is_admin'):
+        return redirect('/')
+    
+    data = test.list_vms()[0]
+    for vm in data:
+        vm['maxdisk_gb'] = round(vm['maxdisk'] / (1024**3), 2)
+        vm['maxmem_mb'] = round(vm['maxmem'] / (1024**2), 2)
+        vm['diskread_mb'] = round(vm['diskread'] / (1024**2), 2)
+        vm['diskwrite_mb'] = round(vm['diskwrite'] / (1024**2), 2)
+        vm['netin_mb'] = round(vm['netin'] / (1024**2), 2)
+        vm['netout_mb'] = round(vm['netout'] / (1024**2), 2)
+    return render_template('vms.html', vms=data)
 
 @app.route('/admin/user/<username>', methods=['GET', 'POST'])
 def admin_user(username):

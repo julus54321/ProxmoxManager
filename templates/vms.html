@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proxmox VM Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        function toggleSidebar() {
+            document.querySelector(".sidebar").classList.toggle("open");
+            document.querySelector(".overlay").classList.toggle("open");
+        }
+    </script>
+</head>
+<body>
+    <div class="open-btn" onclick="toggleSidebar()">☰</div>
+    <div class="sidebar">
+        <div class="close-btn" onclick="toggleSidebar()">×</div>
+        <a href="#">Dashboard</a>
+        <a href="#">Settings</a>
+        <a href="#">About</a>
+    </div>
+    <div class="overlay" onclick="toggleSidebar()"></div>
+    
+    <div class="content">
+        <h1>Proxmox VM Dashboard</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>CPU</th>
+                    <th>Memory</th>
+                    <th>Disk I/O Read (MB)</th>
+                    <th>Disk I/O Write (MB)</th>
+                    <th>Network In (MB)</th>
+                    <th>Network Out (MB)</th>
+                    <th>Disk Space (GB)</th>
+                    <th>Max RAM (MB)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vm in vms %}
+                <tr class="{{ 'running' if vm.status == 'running' else 'stopped' }}">
+                    <td>{{ vm.vmid }}</td>
+                    <td>{{ vm.name }}</td>
+                    <td>{{ vm.status }}</td>
+                    <td>{{ "%.2f" | format(vm.cpu * 100) }}%</td>
+                    <td>{{ "%.2f" | format(vm.mem / vm.maxmem * 100) if vm.maxmem else 0 }}%</td>
+                    <td>{{ vm.diskread_mb }}</td>
+                    <td>{{ vm.diskwrite_mb }}</td>
+                    <td>{{ vm.netin_mb }}</td>
+                    <td>{{ vm.netout_mb }}</td>
+                    <td>{{ vm.maxdisk_gb }}</td>
+                    <td>{{ vm.maxmem_mb }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

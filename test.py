@@ -97,19 +97,6 @@ def control_vm(vmid, action):
     
     return response.json()
 
-def control_vm(vmid, action):
-    ticket, csrf_token = get_proxmox_token()
-    headers = {
-        "Cookie": f"PVEAuthCookie={ticket}",
-        "CSRFPreventionToken": csrf_token,
-    }
-    
-    url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{NODE}/qemu/{vmid}/status/{action}"
-    
-    response = requests.post(url, headers=headers, verify=False)
-    response.raise_for_status()
-    
-    return response.json()
 
 if __name__ == "__main__":
     print(list_vms())

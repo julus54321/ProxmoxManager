@@ -11,6 +11,7 @@ USERNAME = "root"
 REALM= "pam"
 PROXMOX_HOST= "192.168.55.5"
 NODE="pve"
+TLSVEIFY=False
 
 PASSWORD = os.getenv("PASSWORD")
 
@@ -22,7 +23,7 @@ def get_proxmox_token():
         "realm": REALM,
     }
     
-    response = requests.post(url, data=data, verify=False)
+    response = requests.post(url, data=data, verify=TLSVEIFY)
     
     response.raise_for_status()
     
@@ -39,7 +40,7 @@ def list_vms():
         "CSRFPreventionToken": csrf_token,
     }
     url = f"https://{PROXMOX_HOST}:8006/api2/json/cluster/resources?type=vm"
-    response = requests.get(url, headers=headers, verify=False)
+    response = requests.get(url, headers=headers, verify=TLSVEIFY)
     response.raise_for_status()
     
     vms = response.json()["data"]
@@ -63,10 +64,9 @@ def get_vm_type(vmid):
     
     url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{NODE}/"
     
-    qemu_response = requests.get(url + "qemu", headers=headers, verify=False)
-    qemu_vms = qemu_response.json().get("data", [])
+    qemu_response = requests.get(url + "qemu", headers=headers, verify=TLSVEIFY,    qemu_vms = qemu_response.json().get("data", [])
     
-    lxc_response = requests.get(url + "lxc", headers=headers, verify=False)
+    lxc_response = requests.get(url + "lxc", headers=headers, verify=TLSVEIFY)
     lxc_containers = lxc_response.json().get("data", [])
     
     for vm in qemu_vms:
@@ -92,7 +92,7 @@ def control_vm(vmid, action):
     
     url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{NODE}/{vm_type}/{vmid}/status/{action}"
     
-    response = requests.post(url, headers=headers, verify=False)
+    response = requests.post(url, headers=headers, verify=TLSVEIFY)
     response.raise_for_status()
     
     return response.json()

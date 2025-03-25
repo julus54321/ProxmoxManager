@@ -1,29 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proxmox VM Dashboard</title>
+    <title>123123123</title>
     <link rel="stylesheet" href="/static/style.css">
-    <script>
-        function toggleSidebar() {
-            document.querySelector(".sidebar").classList.toggle("open");
-            document.querySelector(".overlay").classList.toggle("open");
-        }
-    </script>
-</head>
-<body>
-    <div class="open-btn" onclick="toggleSidebar()">☰</div>
-    <div class="sidebar">
-        <div class="close-btn" onclick="toggleSidebar()">×</div>
-        <a href="#">Dashboard</a>
-        <a href="#">Settings</a>
-        <a href="#">About</a>
-    </div>
-    <div class="overlay" onclick="toggleSidebar()"></div>
-    
     <div class="content">
-        <h1>Proxmox VM Dashboard</h1>
         <table>
             <thead>
                 <tr>
@@ -38,6 +20,7 @@
                     <th>Network Out (MB)</th>
                     <th>Disk Space (GB)</th>
                     <th>Max RAM (MB)</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,6 +37,17 @@
                     <td>{{ vm.netout_mb }}</td>
                     <td>{{ vm.maxdisk_gb }}</td>
                     <td>{{ vm.maxmem_mb }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('vm_control', vmid=vm.vmid) }}">
+                            <select name="action">
+                                <option value="start">Start</option>
+                                <option value="shutdown">shutdown</option>
+                                <option value="reboot">reboot</option>
+                                <option value="stop">Force Stop</option>
+                            </select>
+                            <input type="submit" value="Execute">
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

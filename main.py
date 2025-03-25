@@ -116,6 +116,16 @@ def vms():
         vm['netout_mb'] = round(vm['netout'] / (1024**2), 2)
     return render_template('vms.html', vms=data)
 
+@app.route('/admin/vms/control/<int:vmid>', methods=['POST'])
+def vm_control(vmid):
+    if not session.get('is_admin'):
+        return redirect('/')
+    
+    action = request.form.get('action')
+    test.control_vm(vmid, action)
+
+    return redirect(url_for('vms'))
+
 @app.route('/admin/user/<username>', methods=['GET', 'POST'])
 def admin_user(username):
     if not session.get('is_admin') or not session.get('logged_in'):

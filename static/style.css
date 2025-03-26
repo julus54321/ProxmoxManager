@@ -6,7 +6,6 @@ body {
     background-color: #f4f4f4;
 }
 
-/* Sidebar */
 .sidebar {
     height: 100%;
     width: 250px;
@@ -57,7 +56,6 @@ body {
     color: #333;
 }
 
-/* Overlay */
 .overlay {
     position: fixed;
     top: 0;
@@ -73,7 +71,6 @@ body {
     display: block;
 }
 
-/* Content */
 .content {
     padding: 20px;
     margin-left: 0;
@@ -84,7 +81,6 @@ h1 {
     text-align: center;
 }
 
-/* Table */
 table {
     width: 100%;
     border-collapse: collapse;

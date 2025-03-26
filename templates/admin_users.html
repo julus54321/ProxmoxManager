@@ -30,8 +30,8 @@
                     </form>
                 </td>
                 <td>
-                    <a href="{{ url_for('admin_users', username=user.username) }}">Manage</a>
-                </td>
+                    <a href="{{ url_for('admin_user', username=user.username) }}">Manage</a>
+                </td>                
             </tr>
             {% endfor %}
         </tbody>

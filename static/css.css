@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300;1,300&display=swap');
+
+body {
+    font-family: "Winky Sans";
+    font-optical-sizing: auto;
+}
+
+div {
+    margin-bottom: 10px;
+    position: relative;
+    align-items: center;
+}
+
+input {
+    font-family: "Winky Sans";
+}
+
+button {
+    margin-top: 10px;
+    font-family: "Winky Sans", sans-serif;
+    font-size: 16px;
+    padding: 12px 24px;
+    position: center;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    align-self: center;
+}
+
+button:hover {
+    background-color: #2980b9;
+    transform: translateY(-4px);
+}
+
+button:active {
+    background-color: #1c5980;
+    transform: translateY(2px);
+}
+
+button:focus {
+    outline: none;
+}
+
+
+
+h1 {
+    font-family: "Winky Sans";
+}
+
+span {
+    margin-bottom: 10px;
+}
+
+.window {
+    display: flex;
+    align-items: center;
+}
+
+.form-create-vm {
+    display: flex;
+    flex-direction: column;
+}
+
+.column {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: middle;
+}
+
+label {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}

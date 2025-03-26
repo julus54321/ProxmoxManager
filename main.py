@@ -106,7 +106,9 @@ def vms():
     if not session.get('is_admin'):
         return redirect('/')
     
-    data = test.list_vms()[0]
+    qemu_vms, lxc_vms = list_vms()
+    data = qemu_vms + lxc_vms
+
     for vm in data:
         vm['maxdisk_gb'] = round(vm['maxdisk'] / (1024**3), 2)
         vm['maxmem_mb'] = round(vm['maxmem'] / (1024**2), 2)
@@ -114,7 +116,12 @@ def vms():
         vm['diskwrite_mb'] = round(vm['diskwrite'] / (1024**2), 2)
         vm['netin_mb'] = round(vm['netin'] / (1024**2), 2)
         vm['netout_mb'] = round(vm['netout'] / (1024**2), 2)
+
     return render_template('vms.html', vms=data)
+
+@app.route('/admin/vms/create')
+def createvm():
+    return render_template('createvm.html')
 
 @app.route('/admin/vms/control/<int:vmid>', methods=['POST'])
 def vm_control(vmid):
@@ -129,18 +136,19 @@ def vm_control(vmid):
 @app.route('/admin/user/<username>', methods=['GET', 'POST'])
 def admin_user(username):
     if not session.get('is_admin') or not session.get('logged_in'):
-        return redirect('/')
-    
+        return redirect(url_for('home'))
+
     user = User.query.filter_by(username=username).first()
+
     if not user:
         return render_template('404.html'), 404
-    
+
     if request.method == 'POST':
         db.session.delete(user)
         db.session.commit()
         return redirect(url_for('admin_users'))
-    
-    return render_template('admin_user.html', user=user)
+
+    return render_template('admin_user.html', user=user)  
 
 @app.errorhandler(404)
 def page_not_found(error):

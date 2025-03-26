@@ -7,7 +7,11 @@
         <title>Admin Page</title>
     </head>
     <body>
-        <h1>Admin Page</h1>
-        <a href="{{ url_for('admin_users') }}">Manage Users</a>
+        <div class="column">
+            <h1>Admin Page</h1>
+
+            <a href="{{ url_for('admin_users') }}">Manage Users</a>
+            <a href="{{ url_for('vms') }}">Manage vms</a>
+        </div>
     </body>
 </html>

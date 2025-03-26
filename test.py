@@ -64,8 +64,9 @@ def get_vm_type(vmid):
     
     url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{NODE}/"
     
-    qemu_response = requests.get(url + "qemu", headers=headers, verify=TLSVEIFY,    qemu_vms = qemu_response.json().get("data", [])
-    
+    qemu_response = requests.get(url + "qemu", headers=headers, verify=TLSVEIFY)
+    qemu_vms = qemu_response.json().get("data", [])
+    #fix
     lxc_response = requests.get(url + "lxc", headers=headers, verify=TLSVEIFY)
     lxc_containers = lxc_response.json().get("data", [])
     

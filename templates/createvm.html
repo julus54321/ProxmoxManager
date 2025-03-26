@@ -25,13 +25,17 @@
         label {
             margin-top: 10px;
         }
+        select, input {
+            padding: 5px;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="column">
             <h1>Create VM</h1>
-            <form class="form-create" id="vmForm">
+            <form class="form-create" id="vmForm" method="POST" action="/admin/vms/create_vm">
                 <label for="vmName">VM Name:</label>
                 <input type="text" id="vmName" name="vmName" required>
                 
@@ -44,13 +48,41 @@
                 <label for="diskSize">Disk Size (GB):</label>
                 <input type="number" id="diskSize" name="diskSize" min="1" required>
                 
+                <!-- Dropdown for selecting an ISO -->
+                <label for="iso">Select ISO:</label>
+                <select name="iso" id="iso">
+                    {% for iso in creation_info.isos %}
+                    <option value="{{ iso }}">{{ iso }}</option>
+                    {% endfor %}
+                </select>
+                
+                <!-- Dropdown for selecting LVM storage -->
+                <label for="lvm_storage">Select LVM Storage:</label>
+                <select name="lvm_storage" id="lvm_storage">
+                    {% for storage in creation_info.lvm_storage %}
+                    <option value="{{ storage.name }}">{{ storage.name }} ({{ storage.free }})</option>
+                    {% endfor %}
+                </select>
+                
+                <!-- Dropdown for selecting a network bridge -->
+                <label for="network">Select Network:</label>
+                <select name="network" id="network">
+                    {% for net in creation_info.networks %}
+                    <option value="{{ net }}">{{ net }}</option>
+                    {% endfor %}
+                </select>
+                
+                <!-- Display max resources as reference -->
+                <p>Max RAM: {{ creation_info.max_ram_mb }} MB</p>
+                <p>Max Cores: {% if creation_info.max_cores %}{{ creation_info.max_cores }}{% else %}N/A{% endif %}</p>
+                
                 <button type="submit">Create VM</button>
             </form>
         </div>
         
         <div class="column">
             <h1>Create LXC</h1>
-            <form class="form-create" id="lxcForm">
+            <form class="form-create" id="lxcForm" method="POST" action="/admin/vms/create_lxc">
                 <label for="lxcName">LXC Name:</label>
                 <input type="text" id="lxcName" name="lxcName" required>
                 

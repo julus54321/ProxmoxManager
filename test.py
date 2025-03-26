@@ -123,17 +123,74 @@ def create_vm(vmid, node=NODE, iso=None, storage='local', **kwargs):
     
     return response.json()
 
+def get_vm_creation_info(node=NODE):
+    ticket, csrf_token = get_proxmox_token()
+    headers = {
+        "Cookie": f"PVEAuthCookie={ticket}",
+        "CSRFPreventionToken": csrf_token,
+    }
+
+    iso_url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/storage/local/content"
+    iso_response = requests.get(iso_url, headers=headers, verify=TLSVEIFY)
+    iso_response.raise_for_status()
+    isos = [iso['volid'] for iso in iso_response.json()["data"] if iso.get('content') == 'iso']
+
+
+    node_url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/status"
+    node_response = requests.get(node_url, headers=headers, verify=TLSVEIFY)
+    node_response.raise_for_status()
+    node_data = node_response.json()["data"]
+
+    memory_info = node_data.get("memory", {})
+    total_ram = memory_info.get("total", 0)
+    total_ram_mb = round(total_ram / (1024 * 1024), 2)
+
+    max_cores = None
+
+    storage_url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/storage"
+    storage_response = requests.get(storage_url, headers=headers, verify=TLSVEIFY)
+    storage_response.raise_for_status()
+    lvm_storage = []
+    for storage in storage_response.json()["data"]:
+        if storage.get('type') in ('lvm', 'lvmthin'):
+            avail = storage.get('avail')
+            if avail is not None:
+                free_gb = round(avail / (1024**3), 2)
+                free_str = f"{free_gb}GB free"
+            else:
+                free_str = "N/A"
+            lvm_storage.append({
+                "name": storage['storage'],
+                "free": free_str
+            })
+
+    network_url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/network"
+    network_response = requests.get(network_url, headers=headers, verify=TLSVEIFY)
+    network_response.raise_for_status()
+    network_data = network_response.json()["data"]
+    networks = [network['iface'] for network in network_data if network.get('iface', '').startswith("vmbr")]
+
+    return {
+        "isos": isos,
+        "max_ram_mb": total_ram_mb,
+        "max_cores": max_cores,
+        "lvm_storage": lvm_storage,
+        "networks": networks
+    }
 
 if __name__ == "__main__":
-    print(list_vms())
-    print(get_vm_type(105))
+    #print(list_vms())
+    #print(get_vm_type(105))
 
-    create_vm(201,
-            iso='archlinux-2025.03.01-x86_64.iso',
-            storage='local',
-            memory=4096,
-            cores=4,
-            ostype='l26',
-            ide0='local-lvm:32',
-            net0='virtio,bridge=vmbr0',
-            boot='order=ide2;virtio0')
+    data = get_vm_creation_info()
+    print(data)
+
+#    create_vm(201,
+#            iso='archlinux-2025.03.01-x86_64.iso',
+#            storage='local',
+#            memory=4096,
+#            cores=4,
+#            ostype='l26',
+#            ide0='local-lvm:32',
+#            net0='virtio,bridge=vmbr0',
+#            boot='order=ide2;virtio0')

@@ -122,7 +122,8 @@ def vms():
 
 @app.route('/admin/vms/create')
 def createvm():
-    return render_template('createvm.html')
+    creation_info = test.get_vm_creation_info()
+    return render_template('createvm.html', creation_info=creation_info)
 
 @app.route('/admin/vms/control/<int:vmid>', methods=['POST'])
 def vm_control(vmid):

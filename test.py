@@ -118,7 +118,7 @@ def create_vm(vmid, node=NODE, iso=None, storage='local', **kwargs):
         else:
             data[key] = value
     
-    response = requests.post(url, headers=headers, data=data, verify=False)
+    response = requests.post(url, headers=headers, data=data, verify=TLSVEIFY)
     response.raise_for_status()
     
     return response.json()

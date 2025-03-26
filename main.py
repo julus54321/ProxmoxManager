@@ -106,7 +106,8 @@ def vms():
     if not session.get('is_admin'):
         return redirect('/')
     
-    qemu_vms, lxc_vms = list_vms()
+    list_vms = test.list_vms()
+    qemu_vms, lxc_vms = list_vms
     data = qemu_vms + lxc_vms
 
     for vm in data:

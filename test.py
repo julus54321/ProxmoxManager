@@ -98,7 +98,42 @@ def control_vm(vmid, action):
     
     return response.json()
 
+def create_vm(vmid, node=NODE, iso=None, storage='local', **kwargs):
+    ticket, csrf_token = get_proxmox_token()
+    headers = {
+        "Cookie": f"PVEAuthCookie={ticket}",
+        "CSRFPreventionToken": csrf_token,
+    }
+    
+    url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/qemu"
+    
+    data = {'vmid': vmid}
+    
+    if iso:
+        data['ide2'] = f"{storage}:iso/{iso},media=cdrom"
+    
+    for key, value in kwargs.items():
+        if isinstance(value, bool):
+            data[key] = 1 if value else 0
+        else:
+            data[key] = value
+    
+    response = requests.post(url, headers=headers, data=data, verify=False)
+    response.raise_for_status()
+    
+    return response.json()
+
 
 if __name__ == "__main__":
     print(list_vms())
     print(get_vm_type(105))
+
+    create_vm(201,
+            iso='archlinux-2025.03.01-x86_64.iso',
+            storage='local',
+            memory=4096,
+            cores=4,
+            ostype='l26',
+            ide0='local-lvm:32',
+            net0='virtio,bridge=vmbr0',
+            boot='order=ide2;virtio0')

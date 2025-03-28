@@ -98,7 +98,7 @@ def control_vm(vmid, action):
     
     return response.json()
 
-def create_vm(vmid, node=NODE, iso=None, storage='local', **kwargs):
+def create_vm(vmid, node=NODE, iso=None, storage='local', machine='q35' , **kwargs):
     ticket, csrf_token = get_proxmox_token()
     headers = {
         "Cookie": f"PVEAuthCookie={ticket}",
@@ -107,7 +107,10 @@ def create_vm(vmid, node=NODE, iso=None, storage='local', **kwargs):
     
     url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/qemu"
     
-    data = {'vmid': vmid}
+    data = {
+        'vmid': vmid,
+        'machine': machine
+    }
     
     if iso:
         data['ide2'] = f"{storage}:iso/{iso},media=cdrom"

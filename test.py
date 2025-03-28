@@ -178,12 +178,30 @@ def get_vm_creation_info(node=NODE):
         "networks": networks
     }
 
+def getbiostype(vmid,node=NODE):
+
+    ticket, csrf_token = get_proxmox_token()
+    headers = {
+        "Cookie": f"PVEAuthCookie={ticket}",
+        "CSRFPreventionToken": csrf_token,
+    }
+
+    bios_url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/qemu/{vmid}/config"
+    bios_response = requests.get(bios_url, headers=headers, verify=TLSVEIFY)
+    bios_response.raise_for_status()
+    bios_data = bios_response.json()["data"]
+    bios_type = bios_data.get('bios', '')
+    return bios_type
+
+
 if __name__ == "__main__":
     #print(list_vms())
     #print(get_vm_type(105))
 
-    data = get_vm_creation_info()
-    print(data)
+    print(getbiostype(107))
+
+    #data = get_vm_creation_info()
+    #print(data)
 
 #    create_vm(201,
 #            iso='archlinux-2025.03.01-x86_64.iso',

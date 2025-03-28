@@ -98,7 +98,7 @@ def control_vm(vmid, action):
     
     return response.json()
 
-def create_vm(vmid, node=NODE, iso=None, storage='local', machine='q35' , **kwargs):
+def create_vm(vmid, node=NODE, iso=None, storage='local', machine='q35' ,autostart=1, **kwargs):
     ticket, csrf_token = get_proxmox_token()
     headers = {
         "Cookie": f"PVEAuthCookie={ticket}",
@@ -109,7 +109,8 @@ def create_vm(vmid, node=NODE, iso=None, storage='local', machine='q35' , **kwar
     
     data = {
         'vmid': vmid,
-        'machine': machine
+        'machine': machine,
+        'autostart': autostart,
     }
     
     if iso:

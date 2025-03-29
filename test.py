@@ -11,7 +11,7 @@ USERNAME = "root"
 REALM= "pam"
 PROXMOX_HOST= "192.168.55.5"
 NODE="pve"
-TLSVEIFY=False
+TLSVERIFY=False
 
 PASSWORD = os.getenv("PASSWORD")
 
@@ -23,7 +23,7 @@ def get_proxmox_token():
         "realm": REALM,
     }
     
-    response = requests.post(url, data=data, verify=TLSVEIFY)
+    response = requests.post(url, data=data, verify=TLSVERIFY)
     
     response.raise_for_status()
     
@@ -42,7 +42,7 @@ def list_vms():
     headers = get_headers()
     
     url = f"https://{PROXMOX_HOST}:8006/api2/json/cluster/resources?type=vm"
-    response = requests.get(url, headers=headers, verify=TLSVEIFY)
+    response = requests.get(url, headers=headers, verify=TLSVERIFY)
     response.raise_for_status()
     
     vms = response.json()["data"]
@@ -62,10 +62,10 @@ def get_vm_type(vmid):
     
     url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{NODE}/"
     
-    qemu_response = requests.get(url + "qemu", headers=headers, verify=TLSVEIFY)
+    qemu_response = requests.get(url + "qemu", headers=headers, verify=TLSVERIFY)
     qemu_vms = qemu_response.json().get("data", [])
     #fix
-    lxc_response = requests.get(url + "lxc", headers=headers, verify=TLSVEIFY)
+    lxc_response = requests.get(url + "lxc", headers=headers, verify=TLSVERIFY)
     lxc_containers = lxc_response.json().get("data", [])
     
     for vm in qemu_vms:
@@ -87,12 +87,13 @@ def control_vm(vmid, action):
     
     url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{NODE}/{vm_type}/{vmid}/status/{action}"
     
-    response = requests.post(url, headers=headers, verify=TLSVEIFY)
+    response = requests.post(url, headers=headers, verify=TLSVERIFY)
     response.raise_for_status()
     
     return response.json()
 
-def create_vm(vmid, node=NODE, iso=None, storage='local', machine='q35' ,autostart=1, **kwargs):
+def create_vm(node=NODE, iso=None, storage='local', machine='q35' ,autostart=1, **kwargs):
+    vmid = get_next_id()
     headers = get_headers()
     
     url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/qemu"
@@ -112,7 +113,7 @@ def create_vm(vmid, node=NODE, iso=None, storage='local', machine='q35' ,autosta
         else:
             data[key] = value
     
-    response = requests.post(url, headers=headers, data=data, verify=TLSVEIFY)
+    response = requests.post(url, headers=headers, data=data, verify=TLSVERIFY)
     response.raise_for_status()
     
     return response.json()
@@ -122,7 +123,7 @@ def create_vm(vmid, node=NODE, iso=None, storage='local', machine='q35' ,autosta
 def get_next_id():
     headers = get_headers()
     next_url = f"https://{PROXMOX_HOST}:8006/api2/json/cluster/nextid"
-    next_response = requests.get(next_url, headers=headers, verify=TLSVEIFY)
+    next_response = requests.get(next_url, headers=headers, verify=TLSVERIFY)
     next_response.raise_for_status()
     next_id = next_response.json()["data"]
 
@@ -132,13 +133,13 @@ def get_vm_creation_info(node=NODE):
     headers = get_headers()
 
     iso_url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/storage/local/content"
-    iso_response = requests.get(iso_url, headers=headers, verify=TLSVEIFY)
+    iso_response = requests.get(iso_url, headers=headers, verify=TLSVERIFY)
     iso_response.raise_for_status()
     isos = [iso['volid'] for iso in iso_response.json()["data"] if iso.get('content') == 'iso']
 
 
     node_url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/status"
-    node_response = requests.get(node_url, headers=headers, verify=TLSVEIFY)
+    node_response = requests.get(node_url, headers=headers, verify=TLSVERIFY)
     node_response.raise_for_status()
     node_data = node_response.json()["data"]
 
@@ -149,7 +150,7 @@ def get_vm_creation_info(node=NODE):
     max_cores = None
 
     storage_url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/storage"
-    storage_response = requests.get(storage_url, headers=headers, verify=TLSVEIFY)
+    storage_response = requests.get(storage_url, headers=headers, verify=TLSVERIFY)
     storage_response.raise_for_status()
     lvm_storage = []
     for storage in storage_response.json()["data"]:
@@ -166,7 +167,7 @@ def get_vm_creation_info(node=NODE):
             })
 
     network_url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/network"
-    network_response = requests.get(network_url, headers=headers, verify=TLSVEIFY)
+    network_response = requests.get(network_url, headers=headers, verify=TLSVERIFY)
     network_response.raise_for_status()
     network_data = network_response.json()["data"]
     networks = [network['iface'] for network in network_data if network.get('iface', '').startswith("vmbr")]
@@ -183,7 +184,7 @@ def getbiostype(vmid,node=NODE):
     headers = get_headers()
 
     bios_url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/qemu/{vmid}/config"
-    bios_response = requests.get(bios_url, headers=headers, verify=TLSVEIFY)
+    bios_response = requests.get(bios_url, headers=headers, verify=TLSVERIFY)
     bios_response.raise_for_status()
     bios_data = bios_response.json()["data"]
     bios_type = bios_data.get('bios', '')

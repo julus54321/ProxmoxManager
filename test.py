@@ -30,15 +30,17 @@ def get_proxmox_token():
     result = response.json()["data"]
     return result["ticket"], result["CSRFPreventionToken"]
 
-
-
-def list_vms():
-    
+def get_headers():
     ticket, csrf_token = get_proxmox_token()
     headers = {
         "Cookie": f"PVEAuthCookie={ticket}",
         "CSRFPreventionToken": csrf_token,
     }
+    return headers
+
+def list_vms():
+    headers = get_headers()
+    
     url = f"https://{PROXMOX_HOST}:8006/api2/json/cluster/resources?type=vm"
     response = requests.get(url, headers=headers, verify=TLSVEIFY)
     response.raise_for_status()
@@ -56,11 +58,7 @@ def list_vms():
     return qemu_vms, lxc_vms
 
 def get_vm_type(vmid):
-    ticket, csrf_token = get_proxmox_token()
-    headers = {
-        "Cookie": f"PVEAuthCookie={ticket}",
-        "CSRFPreventionToken": csrf_token,
-    }
+    headers = get_headers()
     
     url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{NODE}/"
     
@@ -85,11 +83,7 @@ def control_vm(vmid, action):
     if not vm_type:
         raise ValueError(f"VMID {vmid} not found on node {NODE}.")
     
-    ticket, csrf_token = get_proxmox_token()
-    headers = {
-        "Cookie": f"PVEAuthCookie={ticket}",
-        "CSRFPreventionToken": csrf_token,
-    }
+    headers = get_headers()
     
     url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{NODE}/{vm_type}/{vmid}/status/{action}"
     
@@ -99,11 +93,7 @@ def control_vm(vmid, action):
     return response.json()
 
 def create_vm(vmid, node=NODE, iso=None, storage='local', machine='q35' ,autostart=1, **kwargs):
-    ticket, csrf_token = get_proxmox_token()
-    headers = {
-        "Cookie": f"PVEAuthCookie={ticket}",
-        "CSRFPreventionToken": csrf_token,
-    }
+    headers = get_headers()
     
     url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/qemu"
     
@@ -127,12 +117,19 @@ def create_vm(vmid, node=NODE, iso=None, storage='local', machine='q35' ,autosta
     
     return response.json()
 
+
+
+def get_next_id():
+    headers = get_headers()
+    next_url = f"https://{PROXMOX_HOST}:8006/api2/json/cluster/nextid"
+    next_response = requests.get(next_url, headers=headers, verify=TLSVEIFY)
+    next_response.raise_for_status()
+    next_id = next_response.json()["data"]
+
+    return int(next_id)
+
 def get_vm_creation_info(node=NODE):
-    ticket, csrf_token = get_proxmox_token()
-    headers = {
-        "Cookie": f"PVEAuthCookie={ticket}",
-        "CSRFPreventionToken": csrf_token,
-    }
+    headers = get_headers()
 
     iso_url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/storage/local/content"
     iso_response = requests.get(iso_url, headers=headers, verify=TLSVEIFY)
@@ -183,12 +180,7 @@ def get_vm_creation_info(node=NODE):
     }
 
 def getbiostype(vmid,node=NODE):
-
-    ticket, csrf_token = get_proxmox_token()
-    headers = {
-        "Cookie": f"PVEAuthCookie={ticket}",
-        "CSRFPreventionToken": csrf_token,
-    }
+    headers = get_headers()
 
     bios_url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/qemu/{vmid}/config"
     bios_response = requests.get(bios_url, headers=headers, verify=TLSVEIFY)
@@ -202,7 +194,9 @@ if __name__ == "__main__":
     #print(list_vms())
     #print(get_vm_type(105))
 
-    print(getbiostype(107))
+    print(get_next_id())
+
+    #print(getbiostype(107))
 
     #data = get_vm_creation_info()
     #print(data)

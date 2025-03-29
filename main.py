@@ -111,19 +111,17 @@ def vms():
     data = qemu_vms + lxc_vms
 
     for vm in data:
-        vm['maxdisk_gb'] = round(vm['maxdisk'] / (1024**3), 2)
-        vm['maxmem_mb'] = round(vm['maxmem'] / (1024**2), 2)
-        vm['diskread_mb'] = round(vm['diskread'] / (1024**2), 2)
-        vm['diskwrite_mb'] = round(vm['diskwrite'] / (1024**2), 2)
-        vm['netin_mb'] = round(vm['netin'] / (1024**2), 2)
-        vm['netout_mb'] = round(vm['netout'] / (1024**2), 2)
+        vm['cpu'] = round(vm.get('cpu', 0), 2)
+        vm['maxdisk_gb'] = round(vm.get('maxdisk', 0) / (1024**3), 2)
+        vm['maxmem_mb'] = round(vm.get('maxmem', 0) / (1024**2), 2)
+        vm['diskread_mb'] = round(vm.get('diskread', 0) / (1024**2), 2)
+        vm['diskwrite_mb'] = round(vm.get('diskwrite', 0) / (1024**2), 2)
+        vm['netin_mb'] = round(vm.get('netin', 0) / (1024**2), 2)
+        vm['netout_mb'] = round(vm.get('netout', 0) / (1024**2), 2)
 
     return render_template('vms.html', vms=data)
 
-@app.route('/admin/vms/create')
-def createvm():
-    creation_info = test.get_vm_creation_info()
-    return render_template('createvm.html', creation_info=creation_info)
+
 
 @app.route('/admin/vms/control/<int:vmid>', methods=['POST'])
 def vm_control(vmid):

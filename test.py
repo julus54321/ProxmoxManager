@@ -64,7 +64,7 @@ def get_vm_type(vmid):
     
     qemu_response = requests.get(url + "qemu", headers=headers, verify=TLSVERIFY)
     qemu_vms = qemu_response.json().get("data", [])
-    #fix
+
     lxc_response = requests.get(url + "lxc", headers=headers, verify=TLSVERIFY)
     lxc_containers = lxc_response.json().get("data", [])
     
@@ -92,31 +92,7 @@ def control_vm(vmid, action):
     
     return response.json()
 
-def create_vm(node=NODE, iso=None, storage='local', machine='q35' ,autostart=1, **kwargs):
-    vmid = get_next_id()
-    headers = get_headers()
-    
-    url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{node}/qemu"
-    
-    data = {
-        'vmid': vmid,
-        'machine': machine,
-        'autostart': autostart,
-    }
-    
-    if iso:
-        data['ide2'] = f"{storage}:iso/{iso},media=cdrom"
-    
-    for key, value in kwargs.items():
-        if isinstance(value, bool):
-            data[key] = 1 if value else 0
-        else:
-            data[key] = value
-    
-    response = requests.post(url, headers=headers, data=data, verify=TLSVERIFY)
-    response.raise_for_status()
-    
-    return response.json()
+
 
 
 

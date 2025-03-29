@@ -5,6 +5,10 @@ ProxmoxManager is a simple web-based Proxmox VM management tool. This project is
 
 ## TODO
 
+### Important things to do
+- [ ] fix create vm in main.py
+- [ ] fix create vm in test.py
+
 ### VM Creation Enhancements
 - [ ] Add BIOS selection option (**UEFI** or **SeaBIOS**)  
 - [x] Add machine type selection (**Q35** or **i440fx**) --------- instad setting q35 to all because its newer and better 

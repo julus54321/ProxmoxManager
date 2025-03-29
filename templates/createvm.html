@@ -35,12 +35,12 @@
     <div class="container">
         <div class="column">
             <h1>Create VM</h1>
-            <form class="form-create" id="vmForm" method="POST" action="/admin/vms/create_vm">
+            <form class="form-create" id="vmForm" method="POST" action="/admin/vms/create">
                 <label for="vmName">VM Name:</label>
                 <input type="text" id="vmName" name="vmName" required>
                 
                 <label for="cpuCores">CPU Cores:</label>
-                <input type="number" id="cpuCores" name="cpuCores" min="1" required>
+                <input type="number" id="cpuCores" name="cpuCores" min="1" max="8" required>
                 
                 <label for="ram">RAM (MB):</label>
                 <input type="number" id="ram" name="ram" min="512" required>
@@ -48,7 +48,6 @@
                 <label for="diskSize">Disk Size (GB):</label>
                 <input type="number" id="diskSize" name="diskSize" min="1" required>
                 
-                <!-- Dropdown for selecting an ISO -->
                 <label for="iso">Select ISO:</label>
                 <select name="iso" id="iso">
                     {% for iso in creation_info.isos %}
@@ -56,7 +55,6 @@
                     {% endfor %}
                 </select>
                 
-                <!-- Dropdown for selecting LVM storage -->
                 <label for="lvm_storage">Select LVM Storage:</label>
                 <select name="lvm_storage" id="lvm_storage">
                     {% for storage in creation_info.lvm_storage %}
@@ -64,15 +62,20 @@
                     {% endfor %}
                 </select>
                 
-                <!-- Dropdown for selecting a network bridge -->
                 <label for="network">Select Network:</label>
                 <select name="network" id="network">
                     {% for net in creation_info.networks %}
                     <option value="{{ net }}">{{ net }}</option>
                     {% endfor %}
                 </select>
+
+                <div>
+                    <label for="autostart">Set VM to autostart?</label>
+                    <input type="hidden" name="autostart" value="0">
+                    <input id="autostart" name="autostart" type="checkbox" value="1">
+                </div>
                 
-                <!-- Display max resources as reference -->
+
                 <p>Max RAM: {{ creation_info.max_ram_mb }} MB</p>
                 <p>Max Cores: {% if creation_info.max_cores %}{{ creation_info.max_cores }}{% else %}N/A{% endif %}</p>
                 

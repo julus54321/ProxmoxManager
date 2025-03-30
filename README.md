@@ -6,19 +6,19 @@ ProxmoxManager is a simple web-based Proxmox VM management tool. This project is
 ## TODO
 
 ### Important things to do
-- [ ] fix create vm in main.py
-- [ ] fix create vm in test.py
+- [x] fix create vm in main.py
+- [x] fix create vm in test.py
 
 ### VM Creation Enhancements
-- [ ] Add BIOS selection option (**UEFI** or **SeaBIOS**)  
+- [x] Add BIOS selection option (**UEFI** or **SeaBIOS**) ----- why someone would need bios when they can have uefi 
 - [x] Add machine type selection (**Q35** or **i440fx**) --------- instad setting q35 to all because its newer and better 
-- [ ] Implement UI elements for selecting BIOS and machine type in `/admin/createvm`  
+- [x] Implement UI elements for selecting BIOS and machine type in `/admin/createvm` --- not needed  
 - [ ] clonig of vm 
 - [ ] taking snapshots of vms
 - [ ] backups of vms 
 
 ### VM Management Features
-- [ ] Display BIOS type for each VM in `/admin/vms`  
+- [x] Display BIOS type for each VM in `/admin/vms`  
 - [x] Add an option to start the VM immediately after creation in `/admin/createvm`  --- set on by default
 - [ ] Implement auto-start setting in `/admin/createvm` (so VMs boot with the host)  
 - [ ] Display & allow modification of VM auto-start settings in `/admin/vms`  

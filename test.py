@@ -38,6 +38,18 @@ def get_headers():
     }
     return headers
 
+def get_onboot_state(vmid):
+    headers = get_headers()
+
+    url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{NODE}/qemu/{vmid}/config"
+    response = requests.get(url, headers=headers, verify=TLSVERIFY)
+    response.raise_for_status()
+
+    data = response.json().get("data", {})
+    onboot = data.get("onboot", None)
+
+    return True if onboot == 1 else False
+
 def list_vms():
     headers = get_headers()
     
@@ -201,6 +213,6 @@ if __name__ == "__main__":
     #print(get_vm_type(105))
 
     #print(get_next_id())
-
+    print(get_onboot_state(105))
     #print(getbiostype(107))
-    create_vm(name="TestVM", memory=2048, cores=2, disk_size=20, storage="local-lvm", iso="local:iso/archlinux-2025.03.01-x86_64.iso")
+    #create_vm(name="TestVM", memory=2048, cores=2, disk_size=20, storage="local-lvm", iso="local:iso/archlinux-2025.03.01-x86_64.iso")

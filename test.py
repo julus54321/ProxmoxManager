@@ -93,6 +93,34 @@ def control_vm(vmid, action):
     return response.json()
 
 
+def create_vm(name, memory, cores, disk_size, iso=None):
+    headers = get_headers()
+    vmid = get_next_id()
+    
+    vm_config = {
+        'vmid': vmid,
+        'cores': cores,
+        'memory': memory,
+        'net0': f'model=virtio,bridge=vmbr0',
+        'name': name,
+        'virtio0': f'local-lvm:{disk_size}',
+        'bios': 'ovmf',
+        'onboot': 1,
+        'machine': 'q35',
+        'efidisk0': f'local-lvm:1,format=raw,efitype=4m,pre-enrolled-keys=0',
+    }
+
+    if iso:
+        vm_config['ide2'] = f'{iso},media=cdrom'
+
+    url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{NODE}/qemu"
+
+    try:
+        response = requests.post(url, headers=headers, data=vm_config, verify=TLSVERIFY)
+        response.raise_for_status()
+        print(f"VM '{name}' created {vmid}")
+    except requests.exceptions.RequestException as e:
+        print(f"{e} response.text")
 
 
 
@@ -156,6 +184,7 @@ def get_vm_creation_info(node=NODE):
         "networks": networks
     }
 
+
 def getbiostype(vmid,node=NODE):
     headers = get_headers()
 
@@ -171,19 +200,7 @@ if __name__ == "__main__":
     #print(list_vms())
     #print(get_vm_type(105))
 
-    print(get_next_id())
+    #print(get_next_id())
 
     #print(getbiostype(107))
-
-    #data = get_vm_creation_info()
-    #print(data)
-
-#    create_vm(201,
-#            iso='archlinux-2025.03.01-x86_64.iso',
-#            storage='local',
-#            memory=4096,
-#            cores=4,
-#            ostype='l26',
-#            ide0='local-lvm:32',
-#            net0='virtio,bridge=vmbr0',
-#            boot='order=ide2;virtio0')
+    create_vm(name="TestVM", memory=2048, cores=2, disk_size=20, storage="local-lvm", iso="local:iso/archlinux-2025.03.01-x86_64.iso")

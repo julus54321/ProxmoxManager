@@ -122,6 +122,25 @@ def vms():
     return render_template('vms.html', vms=data)
 
 
+@app.route('/admin/vms/create', methods=['GET', 'POST'])
+def createvm():
+    if request.method == 'GET':
+        creation_info = test.get_vm_creation_info()
+        return render_template('createvm.html', creation_info=creation_info)
+    
+    elif request.method == 'POST':
+        vm_params = {
+            'name': request.form.get('vmName'),
+            'cores': int(request.form.get('cpuCores')),
+            'memory': int(request.form.get('ram')),
+            'disk_size': request.form.get('diskSize'),
+            'iso': request.form.get('iso'),
+        }
+        
+        test.create_vm(**vm_params)
+        
+        return redirect('/admin/vms/')
+
 
 @app.route('/admin/vms/control/<int:vmid>', methods=['POST'])
 def vm_control(vmid):

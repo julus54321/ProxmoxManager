@@ -124,6 +124,8 @@ def vms():
 
 @app.route('/admin/vms/create', methods=['GET', 'POST'])
 def createvm():
+    if not session.get('is_admin'):
+        return redirect('/')
     if request.method == 'GET':
         creation_info = test.get_vm_creation_info()
         return render_template('createvm.html', creation_info=creation_info)

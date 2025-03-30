@@ -13,6 +13,9 @@ ProxmoxManager is a simple web-based Proxmox VM management tool. This project is
 - [ ] Add BIOS selection option (**UEFI** or **SeaBIOS**)  
 - [x] Add machine type selection (**Q35** or **i440fx**) --------- instad setting q35 to all because its newer and better 
 - [ ] Implement UI elements for selecting BIOS and machine type in `/admin/createvm`  
+- [ ] clonig of vm 
+- [ ] taking snapshots of vms
+- [ ] backups of vms 
 
 ### VM Management Features
 - [ ] Display BIOS type for each VM in `/admin/vms`  

@@ -20,5 +20,5 @@ ProxmoxManager is a simple web-based Proxmox VM management tool. This project is
 ### VM Management Features
 - [x] Display BIOS type for each VM in `/admin/vms`  
 - [x] Add an option to start the VM immediately after creation in `/admin/createvm`  --- set on by default
-- [ ] Implement auto-start setting in `/admin/createvm` (so VMs boot with the host)  
-- [ ] Display & allow modification of VM auto-start settings in `/admin/vms`  
+- [x] Implement auto-start setting in `/admin/createvm` (so VMs boot with the host)  
+- [x] Display & allow modification of VM auto-start settings in `/admin/vms`  

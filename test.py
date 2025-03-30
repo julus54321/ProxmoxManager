@@ -61,6 +61,16 @@ def get_onboot_state():
     return result
 
 
+def set_onboot_state(vmid, state):
+    headers = get_headers()
+    url = f"https://{PROXMOX_HOST}:8006/api2/json/nodes/{NODE}/qemu/{vmid}/config"
+    payload = {"onboot": 1 if state else 0}
+    
+    response = requests.post(url, headers=headers, json=payload, verify=TLSVERIFY)
+    response.raise_for_status()
+    
+    return response.json()
+
 def list_vms():
     headers = get_headers()
     
@@ -222,7 +232,7 @@ def getbiostype(vmid,node=NODE):
 if __name__ == "__main__":
     #print(list_vms())
     #print(get_vm_type(105))
-
+    #set_onboot_state(105, True)
     #print(get_next_id())
     print(get_onboot_state())
     #print(getbiostype(107))

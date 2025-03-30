@@ -20,6 +20,7 @@
                     <th>Network Out (MB)</th>
                     <th>Disk Space (GB)</th>
                     <th>Max RAM (MB)</th>
+                    <th>Autostart</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -37,6 +38,7 @@
                     <td>{{ vm.netout_mb }}</td>
                     <td>{{ vm.maxdisk_gb }}</td>
                     <td>{{ vm.maxmem_mb }}</td>
+                    <td>{{ vm.onboot }}</td>
                     <td>
                         <form method="post" action="{{ url_for('vm_control', vmid=vm.vmid) }}">
                             <select name="action">
@@ -46,6 +48,15 @@
                                 <option value="stop">Force Stop</option>
                             </select>
                             <input type="submit" value="Execute">
+                        </form>
+                    </td>
+                    <td>
+                        <form method="post" action="{{ url_for('set_vm_onboot', vmid=vm.vmid) }}">
+                            <select name="state">
+                                <option value="True" {% if vm.onboot %}selected{% endif %}>Enable</option>
+                                <option value="False" {% if not vm.onboot %}selected{% endif %}>Disable</option>
+                            </select>
+                            <input type="submit" value="Set">
                         </form>
                     </td>
                 </tr>

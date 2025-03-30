@@ -109,7 +109,9 @@ def vms():
     list_vms = test.list_vms()
     qemu_vms, lxc_vms = list_vms
     data = qemu_vms + lxc_vms
-
+    
+    onboot_states = test.get_onboot_state()
+    
     for vm in data:
         vm['cpu'] = round(vm.get('cpu', 0), 2)
         vm['maxdisk_gb'] = round(vm.get('maxdisk', 0) / (1024**3), 2)
@@ -118,7 +120,8 @@ def vms():
         vm['diskwrite_mb'] = round(vm.get('diskwrite', 0) / (1024**2), 2)
         vm['netin_mb'] = round(vm.get('netin', 0) / (1024**2), 2)
         vm['netout_mb'] = round(vm.get('netout', 0) / (1024**2), 2)
-
+        vm['onboot'] = onboot_states.get(vm['vmid'], False)
+    
     return render_template('vms.html', vms=data)
 
 
@@ -153,6 +156,19 @@ def vm_control(vmid):
     test.control_vm(vmid, action)
 
     return redirect(url_for('vms'))
+
+@app.route('/admin/vms/set_onboot/<int:vmid>', methods=['POST'])
+def set_vm_onboot(vmid):
+    if not session.get('is_admin'):
+        return redirect('/')
+    
+    state_str = request.form.get('state', 'False')
+    new_state = state_str.lower() == 'true'
+    
+    test.set_onboot_state(vmid, new_state)
+    
+    return redirect(url_for('vms'))
+
 
 @app.route('/admin/user/<username>', methods=['GET', 'POST'])
 def admin_user(username):
